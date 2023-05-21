@@ -53,11 +53,11 @@ let capsEntries = entries.map((entry) => [
   entry[1],
 ]);
 sequelize.models = Object.fromEntries(capsEntries);
-const { Auths, Products, Categories , Proveedores } = sequelize.models;
+const { Auths, Products, Categories, Proveedores } = sequelize.models;
 
 Products.belongsTo(Categories, {
   foreignKey: "categoriesId",
-  onDelete: "CASCADE",
+  onDelete: "SET NULL",
 });
 Categories.hasMany(Products, {
   foreignKey: "categoriesId",
@@ -65,7 +65,7 @@ Categories.hasMany(Products, {
 });
 Products.belongsTo(Proveedores, {
   foreignKey: "proveedoresId",
-  onDelete: "CASCADE",
+  onDelete: "SET NULL",
 });
 Proveedores.hasMany(Products, {
   foreignKey: "proveedoresId",
@@ -76,36 +76,9 @@ Products.afterCreate(async (producto, options) => {
   const category = await Categories.findOne({
     where: { id: producto.categoriesId },
   });
-  await category.update({ cantidad_productos: category.cantidad_productos + 1 });
-  const proveedor = await Proveedores.findOne({
-    where: { id: producto.proveedoresId },
-  });
-  await proveedor.update({ cantidad_productos: proveedor.cantidad_productos + 1 });
-  proveedor.save()
-});
-
-Products.beforeUpdate(async (producto, options) => {
-  const prevCategory = await Categories.findOne({
-    where: { id: producto._previousDataValues.categoriesId },
-  });
-  await prevCategory.update({
-    cantidad_productos: prevCategory.cantidad_productos - 1,
-  });
-  prevCategory.save();
-  const prevProveedor = await Proveedores.findOne({
-    where: { id: producto._previousDataValues.proveedoresId },
-  });
-  await prevProveedor.update({
-    cantidad_productos: prevProveedor.cantidad_productos - 1,
-  });
-  prevProveedor.save();
-  const category = await Categories.findOne({
-    where: { id: producto.categoriesId },
-  });
   await category.update({
     cantidad_productos: category.cantidad_productos + 1,
   });
-  category.save();
   const proveedor = await Proveedores.findOne({
     where: { id: producto.proveedoresId },
   });
@@ -115,22 +88,70 @@ Products.beforeUpdate(async (producto, options) => {
   proveedor.save();
 });
 
+Products.beforeUpdate(async (producto, options) => {
+  const prevCategory = await Categories.findOne({
+    where: { id: producto._previousDataValues.categoriesId },
+  });
+  if(prevCategory){
+    await prevCategory.update({
+      cantidad_productos: prevCategory.cantidad_productos - 1,
+    });
+    prevCategory.save();
+  }
+  const prevProveedor = await Proveedores.findOne({
+    where: { id: producto._previousDataValues.proveedoresId },
+  });
+  if (prevProveedor) {
+    await prevProveedor.update({
+      cantidad_productos: prevProveedor.cantidad_productos - 1,
+    });
+    prevProveedor.save();
+  }
+  const category = await Categories.findOne({
+    where: { id: producto.categoriesId },
+  });
+  if(category){
+    await category.update({
+      cantidad_productos: category.cantidad_productos + 1,
+    });
+    category.save();
+  }
+  const proveedor = await Proveedores.findOne({
+    where: { id: producto.proveedoresId },
+  });
+  if (proveedor) {
+    await proveedor.update({
+      cantidad_productos: proveedor.cantidad_productos + 1,
+    });
+    proveedor.save();
+  }
+});
+
 Products.afterDestroy(async (producto, options) => {
   const category = await Categories.findOne({
     where: { id: producto.categoriesId },
   });
-  await category.update({ cantidad_productos: category.cantidad_productos - 1 });
-  category.save()
+  await category.update({
+    cantidad_productos: category.cantidad_productos - 1,
+  });
+  category.save();
   const proveedor = await Proveedores.findOne({
     where: { id: producto.proveedoresId },
   });
-  await proveedor.update({ cantidad_productos: proveedor.cantidad_productos - 1 });
-  proveedor.save()
+  await proveedor.update({
+    cantidad_productos: proveedor.cantidad_productos - 1,
+  });
+  proveedor.save();
 });
 
 const create = async () => {
   await Auths.create({
     email: "pato@mail.com",
+    password: "123456.",
+    rol: "Admin",
+  });
+  await Auths.create({
+    email: "admin@gmail.com",
     password: "123456.",
     rol: "Admin",
   });
@@ -140,9 +161,9 @@ const create = async () => {
     { nombre: "Termofusion", cantidad_productos: 2 },
   ]);
   const proveedores = await Proveedores.bulkCreate([
-    { nombre: "ABRAFER", cantidad_productos: 2 ,precio_sugerido:30},
-    { nombre: "TH", cantidad_productos: 2 ,precio_sugerido:35},
-    { nombre: "AWADUCT", cantidad_productos: 2 , precio_sugerido: 40 },
+    { nombre: "ABRAFER", cantidad_productos: 2, precio_sugerido: 30 },
+    { nombre: "TH", cantidad_productos: 2, precio_sugerido: 35 },
+    { nombre: "AWADUCT", cantidad_productos: 2, precio_sugerido: 40 },
   ]);
   const products = await Products.bulkCreate([
     {

@@ -58,7 +58,7 @@ export const postProveedor = async (req, res, next) => {
       message: "No estas autorizado",
     });
   }
-  const { nombre } = req.body;
+  const { nombre , precio_sugerido } = req.body;
   try {
     const instanceProveedor = await Proveedores.findOne({
       where: {
@@ -73,6 +73,7 @@ export const postProveedor = async (req, res, next) => {
     }
     const newProveedor = await instanceProveedor.create({
       nombre,
+      precio_sugerido
     });
     res.send(newProveedor);
   } catch (error) {

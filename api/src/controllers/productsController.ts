@@ -158,7 +158,7 @@ export const putProduct = async (req, res, next) => {
   }
   const { nombre, medida, precioCompra,precioVenta, stock, imagen, categoriesId , proveedoresId} = req.body;
   const { id } = req.params;
-
+  console.log(req.body)
   try {
     let product = await Products.findOne({
       where: {

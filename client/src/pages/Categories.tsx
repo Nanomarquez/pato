@@ -72,7 +72,6 @@ function Categories() {
     Swal.fire({
       icon: 'info',
       title: 'Estas seguro que quieres eliminar este categoria?',
-      text:"TODOS LOS PRODUCTOS SERAN ELIMINADOS",
       showDenyButton: true,
       confirmButtonText: 'Si',
       denyButtonText: `No`

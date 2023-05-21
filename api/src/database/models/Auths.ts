@@ -30,7 +30,7 @@ module.exports = (sequelize:any) => {
             const hasSign = /[@$!%*#?&.]/.test(value);
             if (!hasSign) {
               throw new Error(
-                "La contraseña debe tener al menos una letra mayúscula y un signo"
+                "La contraseña debe tener al menos un signo"
               );
             }
           },

@@ -1,5 +1,5 @@
 import { Button, Input, Table, Form, Modal, Select } from 'antd'
-import  { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SearchOutlined } from '@ant-design/icons'
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import {
@@ -49,7 +49,7 @@ function Products() {
     setData(products)
     setDataFilter(categories)
     setDataFilterPro(proveedores)
-  }, [products, categories,proveedores])
+  }, [products, categories, proveedores])
   const [imgSrcAdd, setImgSrcAdd] = useState<any>(null)
   const [imgSrc, setImgSrc] = useState<any>(null)
   const handleSearch = (value: string) => {
@@ -117,7 +117,7 @@ function Products() {
     dispatch(postProduct(newData))
     setIsModalVisible(false)
     form.resetFields()
-    setAddData({ categoriesId: "" ,proveedoresId:""})
+    setAddData({ categoriesId: "", proveedoresId: "" })
   }
 
   const handleSellData = (values: any) => {
@@ -175,7 +175,7 @@ function Products() {
       filters,
       onFilter: (value: string, record: any) => record.categoriesId === value,
       filterSearch: true,
-      render: (id: string) => <p>
+      render: (id: string) => <p className="uppercase">
         {filters?.find(el => el.value === id)?.text}
       </p>,
       width: "150px"
@@ -186,7 +186,7 @@ function Products() {
       filters: filtersPro,
       onFilter: (value: string, record: any) => record.proveedoresId === value,
       filterSearch: true,
-      render: (id: string) => <p>
+      render: (id: string) => <p className="uppercase">
         {filtersPro?.find(el => el.value === id)?.text}
       </p>,
       width: "150px"
@@ -199,7 +199,9 @@ function Products() {
     },
     {
       title: 'Precio sugerido',
-      render: (product:Product) => <p> {(product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra} </p> ,
+      render: (product: Product) =>
+        product.proveedore === null ? (<p>Este producto no <br /> tiene proveedor</p>) : (<p>{(product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra} </p>)
+      ,
       width: "150px"
     },
     {
@@ -523,9 +525,8 @@ function Products() {
             <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item>
+            <Form.Item label="Seleccione una categoria" >
               <Select
-                placeholder="Seleccione categoria"
                 onChange={(value, label: any) => {
                   console.log(value)
                   setAddData({
@@ -543,9 +544,8 @@ function Products() {
                 })}
               />
             </Form.Item>
-            <Form.Item>
+            <Form.Item label="Seleccione un proveedor">
               <Select
-                placeholder="Seleccione proveedor"
                 onChange={(value, label: any) => {
                   setAddData({
                     ...addData,
@@ -596,7 +596,7 @@ function Products() {
             <button
               className="bg-[#1976d3]/80 text-white rounded-md p-2 w-full disabled:bg-slate-400"
               type="submit"
-              disabled={addData.categoriesId === "" || addData.proveedoresId}
+              disabled={addData.categoriesId === "" || addData.proveedoresId === ""}
             >
               Agregar producto
             </button>

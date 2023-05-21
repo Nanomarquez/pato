@@ -131,7 +131,8 @@ function Proveedores() {
       title: 'Precio sugerido',
       dataIndex: 'precio_sugerido',
       sorter: (a: Proveedor, b: Proveedor) => a.precio_sugerido - b.precio_sugerido,
-      width: '200px'
+      width: '200px',
+      render: (a:any) => <p>% {a} </p>
     },
     {
       title: 'Creado',
@@ -266,7 +267,7 @@ function Proveedores() {
             <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item name="precio_sugerido" label="Precio sugerido">
+            <Form.Item name="precio_sugerido" label="Precio sugerido %">
               <Input />
             </Form.Item>
             <button
@@ -287,7 +288,7 @@ function Proveedores() {
             >
               <Input />
             </Form.Item>
-            <Form.Item name="precio_sugerido" label="Precio sugerido">
+            <Form.Item name="precio_sugerido" label="Precio sugerido %">
               <Input />
             </Form.Item>
             <button
