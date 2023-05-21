@@ -15,14 +15,20 @@ import {
   getAllCategories,
   type Category
 } from '../redux/slices/categories'
+import {
+  getAllProveedores,
+  type Proveedor
+} from '../redux/slices/proveedores'
 import Swal from 'sweetalert2'
 import { formatDateTime } from '../utils/utils'
 
 function Products() {
   const { products } = useAppSelector((state) => state.products)
   const { categories } = useAppSelector((state) => state.categories)
+  const { proveedores } = useAppSelector((state) => state.proveedores)
   const [data, setData] = useState<Product[]>([])
   const [dataFilter, setDataFilter] = useState<Category[]>([])
+  const [dataFilterPro, setDataFilterPro] = useState<Proveedor[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [edit, setEdit] = useState(false)
   const [sell, setSell] = useState(false)
@@ -37,11 +43,13 @@ function Products() {
   useEffect(() => {
     dispatch(getAllProducts())
     dispatch(getAllCategories())
+    dispatch(getAllProveedores())
   }, [])
   useEffect(() => {
     setData(products)
     setDataFilter(categories)
-  }, [products, categories])
+    setDataFilterPro(proveedores)
+  }, [products, categories,proveedores])
   const [imgSrcAdd, setImgSrcAdd] = useState<any>(null)
   const [imgSrc, setImgSrc] = useState<any>(null)
   const handleSearch = (value: string) => {
@@ -53,6 +61,14 @@ function Products() {
   )
 
   const filters = dataFilter.map(el => {
+    const data = {
+      text: el.nombre,
+      value: el.id
+    }
+    return data
+  })
+
+  const filtersPro = dataFilterPro.map(el => {
     const data = {
       text: el.nombre,
       value: el.id
@@ -84,6 +100,7 @@ function Products() {
     const newData = {
       ...values,
       categoriesId: dataEdit.categoriesId,
+      proveedoresId: dataEdit.proveedoresId,
       imagen: imgSrc === null ? dataEdit.imagen : imgSrc
     }
     // dispatch(updateScholarship(newData, accessToken))
@@ -95,11 +112,12 @@ function Products() {
       ...values,
       imagen: imgSrcAdd,
       categoriesId: addData.categoriesId,
+      proveedoresId: addData.proveedoresId,
     }
     dispatch(postProduct(newData))
     setIsModalVisible(false)
     form.resetFields()
-    setAddData({ categoriesId: "" })
+    setAddData({ categoriesId: "" ,proveedoresId:""})
   }
 
   const handleSellData = (values: any) => {
@@ -163,9 +181,25 @@ function Products() {
       width: "150px"
     },
     {
+      title: "Proveedor",
+      dataIndex: "proveedoresId",
+      filters: filtersPro,
+      onFilter: (value: string, record: any) => record.proveedoresId === value,
+      filterSearch: true,
+      render: (id: string) => <p>
+        {filtersPro?.find(el => el.value === id)?.text}
+      </p>,
+      width: "150px"
+    },
+    {
       title: 'Precio compra',
       dataIndex: 'precioCompra',
       sorter: (a: Product, b: Product) => a.precioCompra - b.precioCompra,
+      width: "150px"
+    },
+    {
+      title: 'Precio sugerido',
+      render: (product:Product) => <p> {(product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra} </p> ,
       width: "150px"
     },
     {
@@ -240,14 +274,14 @@ function Products() {
       dataIndex: '',
       render: (text: any, item: Product) => (
         <div className="flex flex-col gap-1 mx-auto justify-center items-center" key={text}>
-          <Button
-            className="w-[100px] bg-[#1976d3]/80 text-white"
+          <button
+            className="w-[100px] p-1 rounded-md py-[5px] hover:shadow-md duration-200 bg-[#1976d3]/80 button text-white"
             onClick={() => {
               handleVender(item)
             }}
           >
             Vender
-          </Button>
+          </button>
           <Button
             className="w-[100px] "
             onClick={() => {
@@ -292,8 +326,7 @@ function Products() {
     id: 'createdAt',
     desc: true,
   }];
-  console.log(dataEdit)
-  console.log(imgSrc)
+
   return (
     <div className="px-3 py-5 ">
       <h1 className="mb-3 text-3xl font-semibold">Productos</h1>
@@ -360,6 +393,7 @@ function Products() {
           setIsModalVisible(false)
           setDataEdit(null)
           setDataSell(null)
+          setSell(false)
         }}
       >{sell && (
         <Form onFinish={handleSellData} form={formSell}>
@@ -406,7 +440,6 @@ function Products() {
             <Form.Item>
               <Select
                 onChange={(value, label: any) => {
-                  console.log(value)
                   setDataEdit({
                     ...dataEdit,
                     categoriesId: label.value
@@ -414,6 +447,24 @@ function Products() {
                 }}
                 value={dataEdit?.categoriesId}
                 options={filters.map((el) => {
+                  return {
+                    label: el.text,
+                    value: el.value,
+                    element: el
+                  }
+                })}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Select
+                onChange={(value, label: any) => {
+                  setDataEdit({
+                    ...dataEdit,
+                    proveedoresId: label.value
+                  })
+                }}
+                value={dataEdit?.proveedoresId}
+                options={filtersPro.map((el) => {
                   return {
                     label: el.text,
                     value: el.value,
@@ -461,7 +512,7 @@ function Products() {
             <button
               className="bg-[#1976d3]/80 text-white rounded-md p-2 w-full disabled:bg-slate-50"
               type="submit"
-              disabled={dataEdit.categoriesId === ""}
+              disabled={dataEdit.categoriesId === "" || dataEdit.proveedoresId === ""}
             >
               Modificar producto
             </button>
@@ -484,6 +535,25 @@ function Products() {
                 }}
                 value={addData?.categoriesId}
                 options={filters.map((el) => {
+                  return {
+                    label: el.text,
+                    value: el.value,
+                    element: el
+                  }
+                })}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Select
+                placeholder="Seleccione proveedor"
+                onChange={(value, label: any) => {
+                  setAddData({
+                    ...addData,
+                    proveedoresId: label.value
+                  })
+                }}
+                value={addData?.proveedoresId}
+                options={filtersPro.map((el) => {
                   return {
                     label: el.text,
                     value: el.value,
@@ -526,7 +596,7 @@ function Products() {
             <button
               className="bg-[#1976d3]/80 text-white rounded-md p-2 w-full disabled:bg-slate-400"
               type="submit"
-              disabled={addData.categoriesId === ""}
+              disabled={addData.categoriesId === "" || addData.proveedoresId}
             >
               Agregar producto
             </button>

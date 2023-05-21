@@ -15,7 +15,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { Link } from 'react-router-dom';
 import { useAppDispatch } from '../hooks/redux';
 import { logout } from '../redux/slices/auth';
-const pages = ['Proveedores', "Ventas"];
+const pages = ["Ventas"];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -95,6 +95,11 @@ function ResponsiveAppBar() {
                     <Typography textAlign="center">Productos</Typography>
                   </MenuItem>
                 </Link>
+                <Link to='/proveedores'>
+                  <MenuItem onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">Proveedores</Typography>
+                  </MenuItem>
+                </Link>
                 <Link to='/categorias'>
                   <MenuItem onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">Categorias</Typography>
@@ -133,6 +138,14 @@ function ResponsiveAppBar() {
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
                   Productos
+                </Button>
+              </Link>
+              <Link to='/proveedores'>
+                <Button
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  Proveedores
                 </Button>
               </Link>
               <Link to='/categorias'>

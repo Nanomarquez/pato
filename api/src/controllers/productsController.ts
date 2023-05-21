@@ -1,4 +1,4 @@
-const { Products, Categories } = require("../database/db");
+const { Products, Categories , Proveedores} = require("../database/db");
 
 export const getAll = async (req, res, next) => {
   const tokenUser = req.user;
@@ -9,7 +9,12 @@ export const getAll = async (req, res, next) => {
     });
   }
   try {
-    const products = await Products.findAll();
+    const products = await Products.findAll({include:[
+      {
+        model:Proveedores,
+        attributes:['precio_sugerido']
+      }
+    ]});
     res.send(products);
   } catch (error) {
     next(error);
@@ -45,6 +50,34 @@ export const getAllByCategory = async (req, res, next) => {
   }
 };
 
+export const getAllByProveedor = async (req, res, next) => {
+  const tokenUser = req.user;
+  const { proveedoresId } = req.params;
+  if (!tokenUser) {
+    return next({
+      status: 401,
+      message: "No estas autorizado",
+    });
+  }
+  try {
+    if (proveedoresId) {
+      let proveedor = await Proveedores.findOne({ where: { id: proveedoresId } });
+      if (!proveedor) {
+        next({
+          status: 401,
+          message: "Proveedor inexistente",
+        });
+      }
+      let productsByProveedor = await Products.findAll({
+        where: { proveedoresId },
+      });
+      res.send(productsByProveedor);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const postProduct = async (req, res, next) => {
   const tokenUser = req.user;
   if (!tokenUser) {
@@ -53,7 +86,7 @@ export const postProduct = async (req, res, next) => {
       message: "No estas autorizado",
     });
   }
-  const { nombre, medida, precioCompra,precioVenta, stock, imagen, categoriesId } = req.body;
+  const { nombre, medida, precioCompra,precioVenta, stock, imagen, categoriesId,proveedoresId } = req.body;
   try {
     if (medida) {
       const instanceProduct = await Products.findOne({
@@ -77,6 +110,7 @@ export const postProduct = async (req, res, next) => {
       stock,
       imagen,
       categoriesId,
+      proveedoresId
     });
     res.send(newProduct);
   } catch (error) {
@@ -122,7 +156,7 @@ export const putProduct = async (req, res, next) => {
       message: "No estas autorizado",
     });
   }
-  const { nombre, medida, precioCompra,precioVenta, stock, imagen, categoriesId } = req.body;
+  const { nombre, medida, precioCompra,precioVenta, stock, imagen, categoriesId , proveedoresId} = req.body;
   const { id } = req.params;
 
   try {
@@ -145,6 +179,7 @@ export const putProduct = async (req, res, next) => {
       stock,
       imagen,
       categoriesId,
+      proveedoresId
     });
     product.save();
     res.send(product);

@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Perfil from "./pages/Perfil";
 import Products from "./pages/Products";
 import Categories from "./pages/Categories";
+import Proveedores from "./pages/Proveedores";
 import Home from "./pages/Home";
 function App() {
   const { token, auth } = useAppSelector((state: any) => state.auth)
@@ -31,6 +32,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<Products />} />
             <Route path="/categorias" element={<Categories />} />
+            <Route path="/proveedores" element={<Proveedores />} />
           </Routes>
         </>
       )

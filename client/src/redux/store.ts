@@ -7,12 +7,13 @@ import {
 import authReducer from "./slices/auth";
 import productsReducer from "./slices/products";
 import categoriesReducer from "./slices/categories";
+import proveedoresReducer from "./slices/proveedores";
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     products: productsReducer,
-    // matchs:productsReducer,
+    proveedores:proveedoresReducer,
     categories: categoriesReducer,
   },
   middleware: (defaultMiddleware: any) =>
