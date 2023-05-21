@@ -12,8 +12,10 @@ import {
 } from '../redux/slices/proveedores'
 import Swal from 'sweetalert2'
 import { formatDateTime } from '../utils/utils'
+import { Link, useNavigate } from 'react-router-dom';
 
 function Proveedores() {
+  const navigate = useNavigate()
   const { proveedores } = useAppSelector((state) => state.proveedores)
   const [data, setData] = useState<Proveedor[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -119,7 +121,8 @@ function Proveedores() {
       dataIndex: 'nombre',
       sorter: (a: Proveedor, b: Proveedor) => a.nombre.localeCompare(b.nombre),
       fixed: 'left',
-      width: '200px'
+      width: '200px',
+      onclick: (proveedor: Proveedor) => console.log('hola')
     },
     {
       title: 'Cantidad de Productos',
@@ -153,15 +156,21 @@ function Proveedores() {
       showOnDesktop: true,
       dataIndex: '',
       render: (text: any, item: Proveedor) => (
-        <div className="flex flex-col gap-1 mx-auto justify-center items-center" key={text}>
-          <Button
-            className="w-[100px] "
+        <div className="grid grid-cols-2 gap-1 mx-auto justify-center items-center" key={text}>
+          <button
+            className="w-[100px] bg-green-400 py-[5px] hover:text-white p-1 rounded-md"
             onClick={() => {
               handleAumentar(item.id)
             }}
           >
             Aumentar
-          </Button>
+          </button>
+          <Link to={`/proveedores/${item.id}`}
+          target='_blank'
+             className="w-[100px] p-1 rounded-md py-[5px] hover:shadow-md duration-200 bg-[#1976d3]/80 button text-white"
+          >
+            Ver productos
+          </Link>
           <Button
             className="w-[100px] "
             onClick={() => {
