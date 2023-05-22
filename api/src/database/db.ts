@@ -89,41 +89,49 @@ Products.afterCreate(async (producto, options) => {
 });
 
 Products.beforeUpdate(async (producto, options) => {
-  const prevCategory = await Categories.findOne({
-    where: { id: producto._previousDataValues.categoriesId },
-  });
-  if(prevCategory){
-    await prevCategory.update({
-      cantidad_productos: prevCategory.cantidad_productos - 1,
+  console.log(options);
+  console.log(producto);
+  if (options.fields.includes("categoriesId")) {
+    const prevCategory = await Categories.findOne({
+      where: { id: producto._previousDataValues.categoriesId },
     });
-    prevCategory.save();
+    const category = await Categories.findOne({
+      where: { id: producto.categoriesId },
+    });
+    if (prevCategory !== category) {
+      await prevCategory.update({
+        cantidad_productos: prevCategory.cantidad_productos - 1,
+      });
+      prevCategory.save();
+    }
+    if (category) {
+      await category.update({
+        cantidad_productos: category.cantidad_productos + 1,
+      });
+      category.save();
+    }
   }
-  const prevProveedor = await Proveedores.findOne({
-    where: { id: producto._previousDataValues.proveedoresId },
-  });
-  if (prevProveedor) {
-    await prevProveedor.update({
-      cantidad_productos: prevProveedor.cantidad_productos - 1,
+  if (options.fields.includes("proveedoresId")) {
+    const prevProveedor = await Proveedores.findOne({
+      where: { id: producto._previousDataValues.proveedoresId },
     });
-    prevProveedor.save();
-  }
-  const category = await Categories.findOne({
-    where: { id: producto.categoriesId },
-  });
-  if(category){
-    await category.update({
-      cantidad_productos: category.cantidad_productos + 1,
+    const proveedor = await Proveedores.findOne({
+      where: { id: producto.proveedoresId },
     });
-    category.save();
-  }
-  const proveedor = await Proveedores.findOne({
-    where: { id: producto.proveedoresId },
-  });
-  if (proveedor) {
-    await proveedor.update({
-      cantidad_productos: proveedor.cantidad_productos + 1,
-    });
-    proveedor.save();
+
+    if (prevProveedor !== proveedor) {
+      await prevProveedor.update({
+        cantidad_productos: prevProveedor.cantidad_productos - 1,
+      });
+      prevProveedor.save();
+    }
+
+    if (proveedor) {
+      await proveedor.update({
+        cantidad_productos: proveedor.cantidad_productos + 1,
+      });
+      proveedor.save();
+    }
   }
 });
 

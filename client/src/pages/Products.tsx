@@ -195,12 +195,13 @@ function Products() {
       title: 'Precio compra',
       dataIndex: 'precioCompra',
       sorter: (a: Product, b: Product) => a.precioCompra - b.precioCompra,
-      width: "150px"
+      width: "150px",
+      render: (precio:any) => <p>${Number(precio).toFixed(2)}</p>
     },
     {
       title: 'Precio sugerido',
       render: (product: Product) =>
-        product.proveedore === null ? (<p>Este producto no <br /> tiene proveedor</p>) : (<p>{(product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra} </p>)
+        product.proveedore === null ? (<p>Este producto no <br /> tiene proveedor</p>) : (<p>${Number((product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra).toFixed(2)} </p>)
       ,
       width: "150px"
     },
@@ -208,7 +209,8 @@ function Products() {
       title: 'Precio Venta',
       dataIndex: 'precioVenta',
       sorter: (a: Product, b: Product) => a.precioVenta - b.precioVenta,
-      width: "150px"
+      width: "150px",
+      render: (precio:any) => <p>${Number(precio).toFixed(2)}</p>
     },
     {
       title: 'Medida',

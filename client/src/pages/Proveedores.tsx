@@ -62,6 +62,7 @@ function Proveedores() {
     // dispatch(updateScholarship(newData, accessToken))
     dispatch(putProveedor(dataEdit?.id, newData))
     setIsModalVisible(false)
+    setEdit(false)
   }
   const handleAddData = (values: any) => {
     const newData = {
@@ -111,6 +112,8 @@ function Proveedores() {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         dispatch(aumentarProveedor(data))
+        setIsModalVisible(false)
+        setAumentar(false)
       }
     })
   }
@@ -166,7 +169,6 @@ function Proveedores() {
             Aumentar
           </button>
           <Link to={`/proveedores/${item.id}`}
-          target='_blank'
              className="w-[100px] p-1 rounded-md py-[5px] hover:shadow-md duration-200 bg-[#1976d3]/80 button text-white"
           >
             Ver productos
@@ -263,8 +265,10 @@ function Proveedores() {
         onCancel={() => {
           setIsModalVisible(false)
           setDataEdit(null)
-          setAumentar(false)
+          setAumentar(false)  
           setIdAumentar(null)
+          setEdit(false)
+          formAumentar.resetFields()
         }}
       >
         {edit && dataEdit !== null && (

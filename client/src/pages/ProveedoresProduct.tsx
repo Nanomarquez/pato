@@ -194,20 +194,22 @@ console.log(filtersPro)
       title: 'Precio compra',
       dataIndex: 'precioCompra',
       sorter: (a: Product, b: Product) => a.precioCompra - b.precioCompra,
-      width: "150px"
+      width: "150px",
+      render: (precio:any) => <p>${Number(precio).toFixed(2)}</p>
     },
     {
       title: 'Precio sugerido',
       render: (product: Product) =>
-        product.proveedore === null ? (<p>Este producto no <br /> tiene proveedor</p>) : (<p>{(product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra} </p>)
-      ,
+        product.proveedore === null ? (<p>Este producto no <br /> tiene proveedor</p>) : (<p>${Number((product.precioCompra * product.proveedore.precio_sugerido / 100) + product.precioCompra).toFixed(2)} </p>)
+      , 
       width: "150px"
     },
     {
       title: 'Precio Venta',
       dataIndex: 'precioVenta',
       sorter: (a: Product, b: Product) => a.precioVenta - b.precioVenta,
-      width: "150px"
+      width: "150px",
+      render: (precio:any) => <p>${Number(precio).toFixed(2)}</p>
     },
     {
       title: 'Medida',
@@ -266,44 +268,7 @@ console.log(filtersPro)
         return aTimestamp - bTimestamp;
       },
       render: (text: any) => formatDateTime(text)
-    },
-    {
-      title: 'Acciones',
-      width: '200px',
-      showOnResponse: true,
-      showOnDesktop: true,
-      dataIndex: '',
-      render: (text: any, item: Product) => (
-        <div className="flex flex-col gap-1 mx-auto justify-center items-center" key={text}>
-          <button
-            className="w-[100px] p-1 rounded-md py-[5px] hover:shadow-md duration-200 bg-[#1976d3]/80 button text-white"
-            onClick={() => {
-              handleVender(item)
-            }}
-          >
-            Vender
-          </button>
-          <Button
-            className="w-[100px] "
-            onClick={() => {
-              handleEdit(item)
-            }}
-          >
-            Editar
-          </Button>
-          <Button
-            type="primary"
-            className="w-[100px] "
-            danger
-            onClick={() => {
-              handleDelete(item.id)
-            }}
-          >
-            Eliminar
-          </Button>
-        </div>
-      )
-    }
+    } 
   ]
 
   const handleFileInputAdd = (event: any) => {
@@ -343,26 +308,6 @@ console.log(filtersPro)
             onSearch={handleSearch}
             className="w-full lg:w-1/2 bg-[#1976d3]/80 flex h-full p-1  rounded-xl"
           />
-          <div className="flex gap-5">
-            <button
-              className="bg-[#1976d3]/80 text-white rounded-md p-2"
-              onClick={() => {
-                setEdit(false)
-                setSell(false)
-                setIsModalVisible(true)
-              }}
-            >
-              Agregar Producto
-            </button>
-            <button
-              className="bg-[#1976d3]/80 text-white rounded-md p-2"
-              onClick={() => {
-                dispatch(getAllProducts())
-              }}
-            >
-              Refrescar
-            </button>
-          </div>
         </div>
         <div className="tableant flex flex-col w-full lg:w-full">
           <Table
